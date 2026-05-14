@@ -94,11 +94,22 @@
     - curl
     - gpg
 
-- name: Add repo GPG key
-  ansible.builtin.apt_key:
+- name: Create keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download Kubernetes repo GPG key
+  get_url:
     url: https://pkgs.k8s.io/core:/stable:/v1.33/deb/Release.key
-    keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-    state: present
+    dest: /tmp/kubernetes-release.key
+    mode: '0644'
+
+- name: Dearmor and install Kubernetes GPG key
+  command:
+    cmd: gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/kubernetes-release.key
+    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 - name: Add needed repository
   ansible.builtin.apt_repository:
