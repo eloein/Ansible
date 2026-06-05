@@ -1,12 +1,9 @@
 ---
 
-- name: Install and update packages
-  block:
-  become: true
-    - name: Update all packages
-      ansible.builtin.apt:
-        update_cache: yes
-        upgrade: dist
+- name: Update all packages
+  ansible.builtin.apt:
+    update_cache: yes
+    upgrade: dist
 
 - name: Ensure AppArmor is installed and active
   block:
