@@ -6,6 +6,7 @@
   gather_facts: yes
   become: yes
   roles:
-    - newUser
-    - kde
+    #- createNewUser
     - hardenSystem
+    - kdeCustomisation
+    #- installApps
