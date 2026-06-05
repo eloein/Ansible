@@ -2,9 +2,9 @@
 
 - name: Configure New Kubuntu install via Ansible Pull
   hosts: 127.0.0.1
-  connection: local
-  gather_facts: yes
-  #become: yes
+  #connection: local
+  gather_facts: no
+  become: yes
   roles:
     #- createNewUser
     - hardenSystem
