@@ -2,6 +2,7 @@
 
 - name: Install and update packages
   block:
+  become: true
     - name: Update all packages
       ansible.builtin.apt:
         update_cache: yes
