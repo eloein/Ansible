@@ -63,9 +63,9 @@
 - name: Harden Firewall
   block:
     - name: Ensure UFW is installed
-      apt:
-        pkg: ufw
-      state: latest
+      ansible.builtin.package:
+        name: ufw
+      state: present
       update_cache: true
 
     - name: Ensure UFW is disabled
