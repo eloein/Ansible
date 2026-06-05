@@ -21,12 +21,12 @@ ansible-playbook <PLAYBOOK>.yml
 
 - Run a playbook in pull mode:
 ```sh
-ansible-pull -U https://github.com/eloein/Ansible.git -i localhost, playbooks/provisionNewServer.yml
+ansible-pull -U https://github.com/eloein/Ansible.git -i 127.0.0.1, playbooks/provisionNewServer.yml --ask-become-pass
 ```
 
 - Run a playbook in pull mode using your own custom variables:
 ```sh
-ansible-pull -U https://github.com/eloein/Ansible.git -i localhost, playbooks/provisionNewServer.yml --extra-vars "@path/to/your_vars_file.yml"
+ansible-pull -U https://github.com/eloein/Ansible.git -i 127.0.0.1, playbooks/provisionNewServer.yml --extra-vars "@path/to/your_vars_file.yml" --ask-become-pass
 ```
 
 #### Web interface access of services set up by these playbooks can be achieved via SSH tunnels like below
