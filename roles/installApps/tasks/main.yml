@@ -1,0 +1,47 @@
+---
+
+- name: Configure apt repositories
+  block:
+    - name: Add apt repositories
+      ansible.builtin.apt_repository:
+        repo: "{{ item }}"
+        state: present
+        filename: example
+      loop: "{{ repos }}"
+
+    # if it needs a gpg key
+    - name: Download repo GPG key
+      ansible.builtin.get_url:
+        url: https://repo.example.com/gpg.key
+        dest: /etc/apt/keyrings/example.gpg
+        mode: '0644'
+      become: true
+
+- name: Install and update packages
+  block:
+    - name: Update all packages
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install packages
+      apt:
+        pkg: "{{ item }}"
+        state: latest
+        update_cache: false
+      loop: "{{ packages_list }}"
+
+- name: Download and install .deb files
+  block:
+    - name: Download deb package
+      ansible.builtin.get_url:
+        url: "{{ item }}"
+        dest: "/tmp/{{ item }}.deb"
+        mode: '0644'
+      loop: "{{ download_links }}"
+
+    - name: Install deb package
+      ansible.builtin.apt:
+        deb: "/tmp/{{ item }}.deb"
+      become: true
+      loop: "{{ package_list }}"

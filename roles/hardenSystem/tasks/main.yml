@@ -1,0 +1,85 @@
+---
+
+- name: Install and update packages
+  block:
+    - name: Update all packages
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: dist
+
+- name: Ensure AppArmor is installed and active
+  block:
+    - name: Install AppArmor packages
+      ansible.builtin.package:
+        name:
+          - apparmor
+          - apparmor-utils
+        state: present
+
+    - name: Enable and start AppArmor service
+      ansible.builtin.systemd:
+        name: apparmor
+        enabled: yes
+        state: started
+
+- name: Harden SSH login
+  block:
+    - name: Disable SSH password-based authentication
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+
+    - name: Disable root login over SSH
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin no'
+        state: present
+
+    - name: Restart the SSH service to apply changes
+      ansible.builtin.service:
+        name: ssh
+        state: restarted
+
+- name: Lock or remove default users
+  block:
+    - name: Lock the root password to prevent direct login
+      ansible.builtin.user:
+        name: root
+        password: '!'
+
+    - name: Kill any active sessions for default ubuntu user
+      ansible.builtin.command: killall -u ubuntu
+      failed_when: false
+      changed_when: false
+
+    - name: Remove the default ubuntu user and its home directory
+      ansible.builtin.user:
+        name: ubuntu
+        state: absent
+        remove: yes
+
+- name: Harden Firewall
+  block:
+    - name: Ensure UFW is installed
+      apt:
+        pkg: ufw
+      state: latest
+      update_cache: true
+
+    - name: Ensure UFW is disabled
+      ufw:
+        state: enabled
+
+    - name: Reset UFW to factory defaults
+      ansible.builtin.command: ufw --force reset
+      changed_when: true
+
+    - name: Set strict default incoming deny policy
+      ansible.builtin.command: ufw default deny incoming
+      changed_when: true
+
+    - name: Re-enable UFW
+      ansible.builtin.command: ufw --force enable
+      changed_when: true

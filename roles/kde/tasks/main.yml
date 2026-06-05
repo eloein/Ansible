@@ -1,0 +1,62 @@
+---
+
+# Use "-t backup" to run this block
+- name: Backup current KDE config
+  block:
+    - name: Create backup directories
+      file:
+        path: "{{ playbook_dir }}/kde-backup/{{ item }}"
+        state: directory
+      loop:
+        - config
+        - local
+
+    - name: Backup ~/.config files
+      copy:
+        src: "{{ ansible_env.HOME }}/.config/{{ item }}"
+        dest: "{{ backup_dest }}/config/{{ item }}"
+        remote_src: true
+      loop: "{{ kde_config_files }}"
+      ignore_errors: true
+
+    - name: Backup ~/.config dirs
+      copy:
+        src: "{{ ansible_env.HOME }}/.config/{{ item }}/"
+        dest: "{{ playbook_dir }}/kde-backup/config/{{ item }}/"
+        remote_src: true
+      loop: "{{ kde_config_dirs }}"
+      ignore_errors: true
+
+    - name: Backup ~/.local/share dirs
+      copy:
+        src: "{{ ansible_env.HOME }}/.local/share/{{ item }}/"
+        dest: "{{ playbook_dir }}/kde-backup//local/{{ item }}/"
+        remote_src: true
+      loop: "{{ kde_local_dirs }}"
+      ignore_errors: true
+
+- name: Apply KDE config
+  block:
+    - name: Apply ~/.config files
+      copy:
+        src: "{{ role_path }}/files/config/{{ item }}"
+        dest: "{{ ansible_env.HOME }}/.config/{{ item }}"
+      loop: "{{ kde_config_files }}"
+      ignore_errors: true
+
+    - name: Apply ~/.config dirs
+      copy:
+        src: "{{ role_path }}/files/config/{{ item }}/"
+        dest: "{{ ansible_env.HOME }}/.config/{{ item }}/"
+      loop: "{{ kde_config_dirs }}"
+      ignore_errors: true
+
+    - name: Apply ~/.local/share dirs
+      copy:
+        src: "{{ role_path }}/files/local/{{ item }}/"
+        dest: "{{ ansible_env.HOME }}/.local/share/{{ item }}/"
+      loop: "{{ kde_local_dirs }}"
+      ignore_errors: true
+
+    - name: Restart Plasma shell
+      command: kquitapp6 plasmashell && kstart plasmashell
