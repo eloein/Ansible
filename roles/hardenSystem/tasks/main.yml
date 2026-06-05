@@ -65,8 +65,8 @@
     - name: Ensure UFW is installed
       ansible.builtin.package:
         name: ufw
-      state: present
-      update_cache: true
+        state: present
+        update_cache: true
 
     - name: Ensure UFW is disabled
       ufw:
