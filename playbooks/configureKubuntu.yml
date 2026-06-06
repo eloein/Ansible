@@ -7,6 +7,6 @@
   become: yes
   roles:
     #- createNewUser
-    #- hardenSystem
-    - kdeCustomisation
+    - hardenSystem
+    #- kdeCustomisation
     #- installApps
