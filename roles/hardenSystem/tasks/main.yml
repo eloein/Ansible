@@ -22,23 +22,29 @@
 
 - name: Harden SSH login
   block:
-    - name: Disable SSH password-based authentication
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^#?PasswordAuthentication'
-        line: 'PasswordAuthentication no'
+    - name: Ensure sshd_config.d directory exists
+      ansible.builtin.file:
+        path: /etc/ssh/sshd_config.d
+        state: directory
+        mode: '0755'
 
-    - name: Disable root login over SSH
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^#?PermitRootLogin'
-        line: 'PermitRootLogin no'
-        state: present
+    - name: Drop hardened SSH config
+      ansible.builtin.copy:
+        dest: /etc/ssh/sshd_config.d/99-hardening.conf
+        content: |
+          PasswordAuthentication no
+          PermitRootLogin no
+        mode: '0600'
+        owner: root
+        group: root
 
-    - name: Restart the SSH service to apply changes
-      ansible.builtin.service:
-        name: ssh
+    - name: Restart SSH socket and service
+      ansible.builtin.systemd:
+        name: "{{ item }}"
         state: restarted
+      loop:
+        - ssh.socket
+        - ssh.service
 
 - name: Lock or remove default users
   block:

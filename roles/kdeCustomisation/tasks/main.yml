@@ -13,7 +13,7 @@
 
     - name: Backup ~/.config files
       copy:
-        src: "{{ ansible_env.HOME }}/.config/{{ item }}"
+        src: "/home/{{ ansible_env.SUDO_USER }}/.config/{{ item }}"
         dest: "{{ backup_dest }}/config/{{ item }}"
         remote_src: true
       loop: "{{ kde_config_files }}"
@@ -21,7 +21,7 @@
 
     - name: Backup ~/.config dirs
       copy:
-        src: "{{ ansible_env.HOME }}/.config/{{ item }}/"
+        src: "/home/{{ ansible_env.SUDO_USER }}/.config/{{ item }}/"
         dest: "{{ playbook_dir }}/kde-backup/config/{{ item }}/"
         remote_src: true
       loop: "{{ kde_config_dirs }}"
@@ -29,7 +29,7 @@
 
     - name: Backup ~/.local/share dirs
       copy:
-        src: "{{ ansible_env.HOME }}/.local/share/{{ item }}/"
+        src: "/home/{{ ansible_env.SUDO_USER }}/.local/share/{{ item }}/"
         dest: "{{ playbook_dir }}/kde-backup//local/{{ item }}/"
         remote_src: true
       loop: "{{ kde_local_dirs }}"
@@ -40,21 +40,21 @@
     - name: Apply ~/.config files
       copy:
         src: "{{ role_path }}/files/config/{{ item }}"
-        dest: "{{ ansible_env.HOME }}/.config/{{ item }}"
+        dest: "/home/{{ ansible_env.SUDO_USER }}/.config/{{ item }}"
       loop: "{{ kde_config_files }}"
       ignore_errors: true
 
     - name: Apply ~/.config dirs
       copy:
         src: "{{ role_path }}/files/config/{{ item }}/"
-        dest: "{{ ansible_env.HOME }}/.config/{{ item }}/"
+        dest: "/home/{{ ansible_env.SUDO_USER }}/.config/{{ item }}/"
       loop: "{{ kde_config_dirs }}"
       ignore_errors: true
 
     - name: Apply ~/.local/share dirs
       copy:
         src: "{{ role_path }}/files/local/{{ item }}/"
-        dest: "{{ ansible_env.HOME }}/.local/share/{{ item }}/"
+        dest: "/home/{{ ansible_env.SUDO_USER }}/.local/share/{{ item }}/"
       loop: "{{ kde_local_dirs }}"
       ignore_errors: true
 
