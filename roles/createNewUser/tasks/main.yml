@@ -1,11 +1,19 @@
 ---
 
+- name: Check if user "{{ username }}" exists
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ username }}"
+  register: user_check
+  ignore_errors: true
+
 - name: Create "{{ username }}" user with specified groups
   ansible.builtin.user:
     name: "{{ username }}"
     groups: adm,sudo,lxd
     shell: /bin/bash
     create_home: yes
+  when: user_check.failed
 
 - name: Create sudoers file for "{{ username }}"
   ansible.builtin.copy:
@@ -17,16 +25,11 @@
     owner: root
     group: root
     validate: 'visudo -cf %s'
+  when: user_check.failed
 
 - name: Add SSH public key to authorized_keys
   ansible.posix.authorized_key:
     user: "{{ username }}"
     state: present
     key: "{{ ssh_public_key }}"
-
-- name: Delete ubuntu user and home directory
-  ansible.builtin.user:
-    name: ubuntu
-    state: absent
-    remove: yes
-  ignore_errors: yes
+  when: user_check.failed

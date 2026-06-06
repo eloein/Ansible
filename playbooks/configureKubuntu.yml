@@ -1,12 +1,10 @@
 ---
 
-- name: Configure New Kubuntu install via Ansible Pull
+- name: Configure New ubuntu install via Ansible Pull
   hosts: localhost
   connection: local
   gather_facts: no
   become: yes
   roles:
-    #- createNewUser
+    - createNewUser
     - hardenSystem
-    #- kdeCustomisation
-    #- installApps
