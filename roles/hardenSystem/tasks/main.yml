@@ -1,15 +1,16 @@
 ---
 
-- name: Update all packages
-  ansible.builtin.apt:
-    update_cache: yes
-    upgrade: dist
-
-- name: Ensure AppArmor is installed and active
+- name: Install base packages is installed and active
   block:
+    - name: Update all packages
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: dist
+
     - name: Install AppArmor packages
       ansible.builtin.package:
         name:
+          - openssh-server
           - apparmor
           - apparmor-utils
         state: present
